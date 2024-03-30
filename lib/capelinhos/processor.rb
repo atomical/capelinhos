@@ -14,9 +14,15 @@ module Capelinhos
       stats = AdminTools::MemoryStats.new
       processes = stats.passenger_processes
 
+      if !supports_private_dirty_rss?(processes)
+        puts "This system doesn't support private dirty RSS. Falling back to RSS"
+      end
+
+      rss_type = supports_private_dirty_rss?(processes) ? :private_dirty_rss : :rss
+
       processes.each do |process|
         if process.name.include?('RubyApp')
-          rss_megabytes = process.rss / 1024
+          rss_megabytes = process.send(rss_type) / 1024
           if rss_megabytes > @memory_threshold
             shutdown_process(process.pid)
             processes_killed += 1
@@ -30,6 +36,10 @@ module Capelinhos
     end
 
     private
+
+    def supports_private_dirty_rss?(processes)
+      processes.any?{|p| !p.private_dirty_rss.nil?}
+    end
 
     def shutdown_process(pid)
       _instance = instance
