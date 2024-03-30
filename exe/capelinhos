@@ -46,11 +46,13 @@ OptionParser.new do |opts|
 end.parse!
 
 if !options[:max_memory]
+  puts "Version: #{Capelinhos::VERSION}"
   puts "--max-memory is required"
   exit(0)
 end
 
 if !options[:max_processes]
+  puts "Version: #{Capelinhos::VERSION}"
   puts "--max-processes is required"
   exit(0)
 end
