@@ -18,7 +18,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-# kill up to 3 processes that are >= 400 megabytes
+# kill up to 3 processes that use more than 400 megabytes
 $ capelinos --max-memory 400 --max-processes 3
 
 ## Development
