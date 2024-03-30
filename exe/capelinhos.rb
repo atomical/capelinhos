@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require 'optparse'
+require 'capelinhos'
+
+source_root = File.expand_path("..", File.dirname(__FILE__))
+$LOAD_PATH.unshift("#{source_root}/src/ruby_supportlib")
+begin
+  require 'rubygems'
+rescue LoadError
+end
+require 'phusion_passenger'
+
+PhusionPassenger.locate_directories
+PhusionPassenger.require_passenger_lib 'platform_info'
+PhusionPassenger.require_passenger_lib 'platform_info/ruby'
+PhusionPassenger.require_passenger_lib 'admin_tools/memory_stats'
+include PhusionPassenger
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: capelinhos --max-memory 320 --max-processes 3"
+
+  opts.on("--max-memory", "--max-memory MAX_MEMORY", Numeric, "Maximum memory in megabytes to trigger shutdown.") do |n|
+    options[:max_memory] = n
+  end
+
+  opts.on("--max-processes", "--max-processes=NUMBER", Numeric, "Maximum number of processes to gracefully shutdown.") do |n|
+    options[:max_processes] = n
+  end
+
+  opts.on("-h", "--help", "Prints this help") do
+    puts opts
+    exit
+  end
+end.parse!
+
+if !options[:max_memory]
+  puts "--max-memory is required"
+  exit(0)
+end
+
+if !options[:max_processes]
+  puts "--max-processes is required"
+  exit(0)
+end
+
+
+Capelinhos::Processor.kill_memory_hogs!(memory_threshold: options[:max_memory],
+  process_limit: options[:max_processes])
