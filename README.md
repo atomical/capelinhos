@@ -4,7 +4,9 @@ This gem gracefully stops Passenger Ruby processes that have exceeded a memory t
 
 If Phusion Passenger is configured with `PassengerMinInstances` and the number of processes is under that number, then a new process should replace the processes that were shutdown.
 
-Note: This doesn't skip active long running sessions. This feature be added as a default in the future.
+## TODO
+
+* Implement support for multiple Passenger Instances
 
 ## Installation
 
@@ -18,8 +20,10 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-# kill up to 3 processes that use more than 400 megabytes
+```cli
+# shutdown up to 3 processes that use more than 400 megabytes of memory
 $ capelinos --max-memory 400 --max-processes 3
+```
 
 ## Development
 
